@@ -97,39 +97,44 @@ app.delete("/movies/:movieId/", async (request, response) => {
        DELETE FROM movie
        WHERE movie_id = ${movieId}
     `;
-    await db.run(deleteQuery);
-    response.send("Movie Removed");
+  await db.run(deleteQuery);
+  response.send("Movie Removed");
 });
 
-
-app.get("/directors/",async (request,response)=>{
-        let get3Query = `
+app.get("/directors/", async (request, response) => {
+  let get3Query = `
           SELECT *
           FROM  director`;
-        let responseDirector = await db.all(get3Query);
-        console.log(responseDirector)
-          
-        let responseList = responseDirector.map((val)=>{
-            let ans = {
-                directorId : val.director_id,
-                directorName : val.director_name
-            }
-            return ans})
-            response.send(responseList)
+  let responseDirector = await db.all(get3Query);
+  console.log(responseDirector);
+
+  let responseList = responseDirector.map((val) => {
+    let ans = {
+      directorId: val.director_id,
+      directorName: val.director_name,
+    };
+    return ans;
+  });
+  response.send(responseList);
 });
 
-app.get("/directors/:directorId/movies/",async (request,response)=>{
-    let {directorId} = request.params;
-    let joinQuery = `
+app.get("/directors/:directorId/movies/", async (request, response) => {
+  let { directorId } = request.params;
+  let joinQuery = `
             SELECT *
             FROM movie NATURAL JOIN director
             WHERE movie.director_id = ${directorId};
-    `
-    let joinResponse = await db.get(joinQuery);
-    let finalResponse = joinResponse.map((val)=>{
-        let finalAns = {movieName:val.movie_name}
-        return finalAns
-    })
+    `;
+  let joinResponse = await db.all(joinQuery);
+  let finalResponse = joinResponse.map((val) => {
+    let finalAns = { movieName: val.movie_name };
+    return finalAns;
+  });
+  response.send(finalResponse);
+});
+
+module.exports = app;
+
     response.send(finalResponse);
 })
 
